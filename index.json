@@ -1,0 +1,17 @@
+---
+layout: none
+permalink: /_site/posts.json
+---
+[
+  {% for article in site.articles %}
+    {
+      "id": {{ article.relative_path | jsonify }},
+      "title": {{ article.title | jsonify }},
+      "track": {{ article.track | jsonify }},
+      "order": {{ article.order | jsonify }},
+      "abstract": {{ article.abstract | jsonify }},
+      "tags": {{ article.tags | jsonify }},
+      "url": {{ article.url | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]
