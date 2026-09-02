@@ -1,9 +1,0 @@
-name: Mitt Kurssett
-permalink: pretty
-destination: _site
-permalink: /:day/:title:output_ext
-
-collections:
-  articles:
-    output: true
-    permalink: /articles/:name/output_ext
