@@ -1,5 +1,5 @@
 // 1. Define the file path or API web URL
-const DATA_SOURCE_URL = "./my-schema.json"; // Or "https://example.com"
+const DATA_SOURCE_URL = "my-schema.json"; // Or "https://example.com"
 
 async function loadAndDisplaySchemas() {
   try {
