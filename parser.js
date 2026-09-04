@@ -1,34 +1,39 @@
-// 1. Grab all JSON-LD script blocks from the document DOM
-const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+// 1. Define the file path or API web URL
+const DATA_SOURCE_URL = "./my-schema.json"; // Or "https://example.com"
 
-// 2. Loop through all found scripts and accumulate the results into a single variable
-const htmlOutput = Array.from(jsonLdScripts).reduce((accumulator, scriptTag) => {
+async function loadAndDisplaySchemas() {
   try {
-    // Parse the textual JSON inside the script tag into a usable JS object
-    const schemaData = JSON.parse(scriptTag.textContent);
+    // 2. Fetch the external JSON data
+    const response = await fetch(DATA_SOURCE_URL);
     
-    // JSON-LD can be a single object or an array of objects. Normalize into an array.
+    // Check if the network request failed (e.g., 404 or 500 errors)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // 3. Parse the stream data directly into native JavaScript structures
+    const schemaData = await response.json();
+    
+    // Normalize into an array (handles both single schema objects or lists)
     const schemasArray = Array.isArray(schemaData) ? schemaData : [schemaData];
 
-    // Loop through the schemas extracted from this specific script block
-    const scriptBlockHtml = schemasArray.map(schema => {
-      // Safely extract core JSON-LD metadata fields (with fallback text)
+    // 4. Loop and build the HTML variable using reduce
+    const htmlOutput = schemasArray.reduce((accumulator, schema) => {
       const type = schema['@type'] || 'Unknown Type';
       const name = schema.name || schema.headline || 'Unnamed Schema';
       
-      // Filter out meta tags like @context/@type to loop over structural attributes
+      // Map out metadata fields, ignoring the root context tags
       const attributesHtml = Object.entries(schema)
         .filter(([key]) => !key.startsWith('@') && key !== 'name' && key !== 'headline')
         .map(([key, value]) => {
-          // If the property value is a nested object, convert it to a readable string
+          // Flatten child objects (like a nested Author or Place entity) into text strings
           const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
           return `<li><strong>${key}:</strong> ${displayValue}</li>`;
         })
         .join('');
 
-      // Build out the dynamic HTML template structure
-      return `
-        <div class="schema-card" style="border: 1px solid #1a1a1a; padding: 15px; margin: 15px 0; font-family: sans-serif;">
+      return accumulator + `
+        <div class="schema-card" style="border: 1px solid #333; padding: 15px; margin: 15px 0; font-family: system-ui;">
           <h3>Schema Type: ${type}</h3>
           <p><strong>Target Name:</strong> ${name}</p>
           <ul>
@@ -36,14 +41,20 @@ const htmlOutput = Array.from(jsonLdScripts).reduce((accumulator, scriptTag) => 
           </ul>
         </div>
       `;
-    }).join('');
+    }, "");
 
-    return accumulator + scriptBlockHtml;
+    // 5. Inject the completed string into your layout container
+    document.getElementById("schema-display-panel").innerHTML = htmlOutput;
+
   } catch (error) {
-    console.error("Failed to parse a JSON-LD script block:", error);
-    return accumulator; // Skip corrupted blocks without breaking the loop
+    console.error("Could not fetch or parse JSON-LD data:", error);
+    document.getElementById("schema-display-panel").innerHTML = `
+      <p style="color: red;">Failed to load metadata. Please check source URL.</p>
+    `;
   }
-}, ""); // Initializing the accumulator variable as an empty string
+}
 
-// 3. Inject the final populated variable directly into your webpage DOM container
-document.getElementById("schema-display-panel").innerHTML = htmlOutput;
+// Fire the function when the page script runs
+loadAndDisplaySchemas();
+
+
