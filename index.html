@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON-LD Metadata Parser</title>
+
+    <!-- Example JSON-LD Schema 1 (Article) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": "AI Advancements in 2026",
+      "datePublished": "2026-09-04",
+      "author": "Tech Staff"
+    }
+    </script>
+
+    <!-- Example JSON-LD Schema 2 (Product) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Ergonomic Office Chair",
+      "sku": "CHAIR-992",
+      "price": "149.99"
+    }
+    </script>
+</head>
+<body>
+
+    <!-- Container where the cumulative generated HTML variable will be injected -->
+    <div id="schema-display-panel"></div>
+
+    <script src="parser.js"></script>
+</body>
+</html>
